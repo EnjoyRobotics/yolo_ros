@@ -50,6 +50,8 @@ class YoloNode(LifecycleNode):
 
     def __init__(self) -> None:
         super().__init__("yolo_node")
+        # counter for image callbach throttling
+        self.counter = 0
 
         # params
         self.declare_parameter("model_type", "YOLO")
@@ -320,6 +322,11 @@ class YoloNode(LifecycleNode):
         return keypoints_list
 
     def image_cb(self, msg: Image) -> None:
+        self.counter += 1
+        if self.counter >= 15:
+            self.counter = self.counter % 15
+        if self.counter % 15 != 0:
+            return
 
         if self.enable:
 
